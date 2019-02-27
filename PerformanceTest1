@@ -5,12 +5,12 @@
 #include <FEHRPS.h>
 #include <FEHServo.h>
 //Declarations for encoders & motors
-DigitalEncoder right_encoder(FEHIO::P0_7);
-DigitalEncoder left_encoder(FEHIO::P3_0);
+DigitalEncoder right_encoder(FEHIO::P0_0);
+DigitalEncoder left_encoder(FEHIO::P2_7);
 FEHMotor right_motor(FEHMotor::Motor1,9.0);
 FEHMotor left_motor(FEHMotor::Motor0,9.0);
-AnalogInputPin cds (FEHIO::P0_1);
-FEHServo clawServo(FEHIO::Servo7);
+AnalogInputPin cds (FEHIO::P1_7);
+//FEHServo clawServo(FEHIO::Servo7);
 void move_forward(int percent, int counts) //using encoders
 {
     //Reset encoder counts
@@ -49,54 +49,85 @@ void turn(int leftPercent, int rightPercent, int counts) {
 
 
 int main(void)
-{   if(cds.Value()<3){
+{
+
     int motor_percent = 25; //Input power level here
-    int expected_counts = 251; //Input theoretical counts here
+    int expected_counts =253 ; //Input theoretical counts here
 
     float x, y; //for touch screen
 
     //Initialize the screen
     LCD.Clear(BLACK);
     LCD.SetFontColor(WHITE);
-
+    LCD.WriteLine("The CDS Value is:");
+    LCD.Write(cds.Value());
     LCD.WriteLine("Shaft Encoder Exploration Test");
     LCD.WriteLine("Touch the screen");
     while(!LCD.Touch(&x,&y)); //Wait for screen to be pressed
-    while(LCD.Touch(&x,&y)); //Wait for screen to be unpressed
-    move_forward(motor_percent, expected_counts);
-    int leftMotorPercent=0;
+    while(LCD.Touch(&x,&y));
+    while(cds.Value()){//Wait for screen to be unpressed
+     if(cds.Value()<3.2){
+    //move forward 14 inches
+   move_forward(motor_percent, expected_counts);
+    //turn to face walll
+    int leftMotorPercent=-25;
     int rightMotorPercent=25;
-    expected_counts=300;
-    turn(leftMotorPercent,rightMotorPercent,expected_counts);
-    expected_counts=167;
-    move_forward(motor_percent, expected_counts);
-    expected_counts=246.3;
-    turn(leftMotorPercent,rightMotorPercent,expected_counts);
-    motor_percent=50;
-    expected_counts=1046;
-     move_forward(motor_percent,expected_counts);
-    motor_percent=25;
-    expected_counts=837;
-    move_forward(motor_percent,expected_counts);
-    clawServo.SetDegree(90); 
-    clawServo.SetDegree(0);
+    expected_counts=180;
+   turn(leftMotorPercent,rightMotorPercent,expected_counts);
+    //move backward 14 inches
     motor_percent=-25;
-    expected_counts=293;
-    move_forward(motor_percent,expected_counts);
-    expected_counts=320;
-    leftMotorPercent=25;
-    rightMotorPercent=0;
-    turn(leftMotorPercent,rightMotorPercent,expected_counts);
-    expected_counts=711;
-    motor_percent=25;
-    move_forward(motor_percent,expected_counts);
-    motor_percent=50;
-    expected_counts=544;
-    move_forwrad(motor,percent,expected_counts);
-    right_motor.Stop();
-    left_motor.Stop();
-    LCD.WriteLine("Yay")
+    expected_counts=370;
+    move_forward(motor_percent, expected_counts);
+    //turn to face the ramp
+  expected_counts=310;
+  leftMotorPercent=25;
+  rightMotorPercent=0;
+   turn(leftMotorPercent,rightMotorPercent,expected_counts);
+    // move up ramp at 50 speed for 25 inches
+    motor_percent=70;
+    expected_counts=1000;
+     move_forward(motor_percent,expected_counts);
+     motor_percent=25;
+     expected_counts=480;
+     move_forward(motor_percent,expected_counts);
+     //move forward for 20 inches to reach claw machine
+    //motor_percent=25;
+    //expected_counts=1055;
+  //move_forward(motor_percent,expected_counts);
+    //open claw and close?? if we need
+   // clawServo.SetDegree(90);
+   // clawServo.SetDegree(0);
+    //move backward for 7 inches
+   // motor_percent=-25;
+  // expected_counts=42;
+  // move_forward(motor_percent,expected_counts);
+    //turn to face the ramp
+    //expected_counts=320;
+   // leftMotorPercent=25;
+   //rightMotorPercent=0;
+   //turn(leftMotorPercent,rightMotorPercent,expected_counts);
+    //move 17 inches to get to the ramp
+   // expected_counts=169;
+   // motor_percent=25;
+  // move_forward(motor_percent,expected_counts);
+    //move down the ramp at 50 for 13 inches
+  //  motor_percent=50;
+  //  expected_counts=145;
+  // move_forward(motor_percent,expected_counts);
+  // right_motor.Stop();
+   // left_motor.Stop();
+    LCD.WriteLine("Yay");
     Sleep(2.0); //Wait for counts to stabilize
     return 0;
     }
+    }
 }
+//while(cds.Value()){
+//move_forward
+//turn 90 degrees
+//move over light
+//if cd.Value>1
+//move to red buttton
+//else if cds.value<1
+//move to the blue button
+//
